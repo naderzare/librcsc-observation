@@ -93,6 +93,10 @@ public:
         //! v14+ card status
         Card card_;
 
+        //! v18+ focus point
+        double focus_point_dir_;
+        double focus_point_dist_;
+
         /*!
           \brief initialize member variables
         */
@@ -113,7 +117,9 @@ public:
               kicked_( false ),
               tackle_( false ),
               charged_( false ),
-              card_( NO_CARD )
+              card_( NO_CARD ),
+              focus_point_dir_( 0.0 ),
+              focus_point_dist_( 0.0 )
           { }
 
         /*!
@@ -183,10 +189,17 @@ private:
                   const SideID our_side );
 
     /*!
-      \brief analyze raw server message (protcol version 8 or later)
+      \brief analyze raw server message (protcol version 8 to 17)
       \param msg server message
     */
     void parseV8( const char * msg,
+                  const SideID our_side );
+
+    /*!
+      \brief analyze raw server message (protcol version 18 or later)
+      \param msg server message
+    */
+    void parseV18( const char * msg,
                   const SideID our_side );
 
     /*!

@@ -94,8 +94,11 @@ FullstateSensor::parse( const char * msg,
 
     M_our_players.clear();
     M_their_players.clear();
-
-    if ( version >= 8.0 )
+    if ( version >= 18.0 )
+    {
+        parseV18( msg, our_side );
+    }
+    else if ( version >= 8.0 )
     {
         parseV8( msg, our_side );
     }
@@ -351,6 +354,228 @@ FullstateSensor::parseV8( const char * msg,
     }
 }
 
+/*-------------------------------------------------------------------*/
+/*!
+
+*/
+void
+FullstateSensor::parseV18( const char * msg,
+                          const SideID our_side )
+{
+    /*
+      fullstate v18+ format:
+
+      (fullstate <time>
+        (pmode {goalie_catch_ball_{l|r}|<play mode>})
+        (vmode {high|low} {narrow|normal|high})
+        //(stamina <stamina> <effort> <recovery>)
+        (count <kicks> <dashes> <turns> <catches> <moves>
+               <turn_necks> <change_views> <says> <set_focus>)
+        (arm (movable <MOVABLE>) (expires <EXPIRES>)
+        (target <DIST> <DIR>) (count <COUNT>))
+        (score <team_points> <enemy_points>)
+        ((b) <pos.x> <pos.y> <vel.x> <vel.y>)
+        <players>)
+
+      // after rcssserver-18., focus point info has been omit.
+
+      players : {<player>|<player> <players>}
+
+      player : (v8-13)
+       ((p {l|r} <unum> {g|<player_type_id>})
+        <pos.x> <pos.y> <vel.x> <vel.y> <body_angle> <neck_angle>[ <point_dist> <point_dir>]
+        (<stamina> <effort> <recovery>[ <capacity>]))
+
+      player : (v14)
+        ((p {l|r} <unum> [g] <player_type_id>)
+         <pos.x> <pos.y> <vel.x> <vel.y> <body_angle> <neck_angle>[ <point_dist> <point_dir>]
+         (<stamina> <effort> <recovery>[ <capacity>])
+         [t|k] [y|r])
+
+     player : (v18)
+        ((p {l|r} <unum> [g] <player_type_id>)
+         <pos.x> <pos.y> <vel.x> <vel.y> <body_angle> <neck_angle> <focus_point>[ <point_dist> <point_dir>]
+         (<stamina> <effort> <recovery>[ <capacity>])
+         [t|k] [y|r])
+      */
+
+    char * next;
+
+    while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip "(fullstate"
+    // play mode
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to "(pmode"
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // ignore playmode info
+
+    // view mode
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to (vmode
+    while ( *msg != '\0' && *msg != ')' ) ++msg;// get_view_mode(msg); // ignore view mode info
+
+    // stamina info or count info
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to next token
+    if ( ! std::strncmp( msg, "(stamina", 8 ) )
+    {
+        while (  *msg != '\0' && *msg != ')' ) ++msg; // ignore stamina info
+    }
+    // count info
+    // (count <kicks> <dashes> <turns> <catches> <moves> <turn_necks> <change_views> <says>)
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to "(count"
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // ignore count info
+
+    // arm info
+    // (arm (movable <MOVABLE>) (expires <EXP>) (target <DIST> <DIR>) (count <CNT>))
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to "(arm..."
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // skip to movable end
+    ++msg;
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // skip to expires end
+    ++msg;
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // skip to target end
+    ++msg;
+    while ( *msg != '\0' && *msg != ')' ) ++msg; // skip to count end
+
+    // score info
+    // (score <team_points> <enemy_points>)
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to (score
+    while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip to " LSCORE..."
+
+    int score_l = static_cast< int >( std::strtol( msg, &next, 10) ); msg = next;
+    int score_r = static_cast< int >( std::strtol( msg, &next, 10 ) ); msg = next;
+
+    if ( our_side == LEFT )
+    {
+        M_our_score = score_l;
+        M_their_score = score_r;
+    }
+    else
+    {
+        M_our_score = score_r;
+        M_their_score = score_l;
+    }
+
+    // ball info
+    // ((b) <pos.x> <pos.y> <vel.x> <vel.y>)
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to (ball
+    while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip "(ball"
+
+    M_ball.pos_.x = std::strtod( msg, &next ); msg = next;
+    M_ball.pos_.y = std::strtod( msg, &next ); msg = next;
+    M_ball.vel_.x = std::strtod( msg, &next ); msg = next;
+    M_ball.vel_.y = std::strtod( msg, &next ); msg = next;
+
+    //((p {l|r} <unum>{g|<player_type_id>}) <pos.x> <pos.y>
+    //   <vel.x> <vel.y> <body_angle> <neck_angle>[ <point_dist> <point_dir>]
+    //   (<stamina> <effort> <recovery>[ <capacity>])
+    //   [t|k] [y|r])
+    //
+    //((p {l|r} <unum> [g] <player_type_id>}) <pos.x> <pos.y>
+    //   <vel.x> <vel.y> <body_angle> <neck_angle>[ <point_dist> <point_dir>]
+    //   (<stamina> <effort> <recovery>[ <capacity>])
+    //   [t|k|f] [y|r])
+    while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to "(p"
+    while ( *msg != '\0' )
+    {
+        while ( *msg != '\0' && *msg != 'p' ) ++msg; // skip to "p"
+        if ( *msg == '\0' )
+        {
+            break;
+        }
+
+        PlayerT player;
+
+        while ( *msg != '\0' && *msg != ' ' ) ++msg;
+        ++msg; // skip "p "
+        player.side_ = ( *msg == 'l'
+                         ? LEFT
+                         : RIGHT );
+
+        msg += 2; // skip "l " or "r "
+        player.unum_ = static_cast< int >( std::strtol( msg, &next, 10 ) );
+        msg = next;
+
+        while ( *msg == ' ' ) ++msg;
+
+        if ( *msg == 'g' )
+        {
+            player.goalie_ = true;
+            player.type_ = Hetero_Default;
+            ++msg;
+            while ( *msg == ' ' ) ++msg;
+        }
+
+        if ( std::isdigit( *msg ) )
+        {
+            player.type_ = static_cast< int >( std::strtol( msg, &next, 10 ) );
+            msg = next;
+        }
+
+        while ( *msg == ' ' || *msg == ')' ) ++msg; // skip to x pos
+
+        player.pos_.x = std::strtod( msg, &next ); msg = next;
+        player.pos_.y = std::strtod( msg, &next ); msg = next;
+        player.vel_.x = std::strtod( msg, &next ); msg = next;
+        player.vel_.y = std::strtod( msg, &next ); msg = next;
+        player.body_ = std::strtod( msg, &next ); msg = next;
+        player.neck_ = std::strtod( msg, &next ); msg = next;
+        player.focus_point_dir_ = std::strtod( msg, &next ); msg = next;
+        player.focus_point_dist_ = std::strtod( msg, &next ); msg = next;
+        std::cout<<player.unum_<<" "<<player.focus_point_dir_<<" "<<player.focus_point_dist_<<std::endl;
+        ++msg;
+        if ( *msg != '(' )
+        {
+            player.pointto_dist_ = std::strtod( msg, &next ); msg = next;
+            player.pointto_dir_ = std::strtod( msg, &next ); msg = next;
+        }
+        while ( *msg != '\0' && *msg != '(' ) ++msg; // skip to "(stamina"
+        while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip to space " "
+        ++msg;
+        player.stamina_ = std::strtod( msg, &next ); msg = next;
+        player.effort_ = std::strtod( msg, &next ); msg = next;
+        player.recovery_ = std::strtod( msg, &next ); msg = next;
+        if ( *msg != ')' )
+        {
+            player.stamina_capacity_ = std::strtod( msg, &next ); msg = next;
+        }
+
+        while ( *msg == ')' ) ++msg;
+        while ( *msg == ' ' ) ++msg;
+
+        if ( *msg == 'k' ) // kick
+        {
+            player.kicked_ = true;
+            ++msg;
+            while ( *msg == ' ' ) ++msg;
+        }
+        else if ( *msg == 't' ) // tackle
+        {
+            player.tackle_ = true;
+            ++msg;
+            while ( *msg == ' ' ) ++msg;
+        }
+        else if ( *msg == 'f' )
+        {
+            player.charged_ = true;
+            ++msg;
+            while ( *msg == ' ' ) ++msg;
+        }
+
+        if ( *msg == 'y' ) // yellow card
+        {
+            player.card_ = YELLOW;
+        }
+        else if ( *msg == 'r' ) // red card
+        {
+            player.card_ = RED;
+        }
+
+        if ( our_side == player.side_ )
+        {
+            M_our_players.push_back( player );
+        }
+        else
+        {
+            M_their_players.push_back( player );
+        }
+    }
+}
 /*-------------------------------------------------------------------*/
 /*!
 
