@@ -63,6 +63,8 @@ private:
 
     //! pointer of turn_neck for dynamic allocation
     PlayerTurnNeckCommand * M_command_turn_neck;
+    //! pointer of set_focus for dynamic allocation
+    PlayerSetFocusCommand * M_command_set_focus;
     //! pointer of change_view for dynamic allocation
     PlayerChangeViewCommand * M_command_change_view;
     //! pointer of say for dynamic allocation
@@ -84,7 +86,8 @@ private:
 
     //! checker of turn_neck. true if turn_neck was done at last
     bool M_done_turn_neck;
-
+    //! checker of set_focus. true if turn_neck was done at last
+    bool M_done_set_focus;
     // stored last action effect variables
 
     // kick effect
@@ -114,6 +117,10 @@ private:
 
     // turn_neck effect
     double M_turn_neck_moment; //!< last turn_neck moment
+
+    // focus_point effect
+    double M_focus_point_moment_dist;
+    double M_focus_point_moment_dir;
 
     // say effect
     std::string M_say_message; //!< last said message string
@@ -309,6 +316,13 @@ public:
       command argument moment is normalized by server parameter.
     */
     void setTurnNeck( const AngleDeg & moment );
+    /*!
+      \brief create set_focus command and its effect with set_focus parameter
+      \param moment set_focus dir moment and dist moment that player wants to focus
+
+      command argument moment is normalized by server parameter.
+    */
+    void setFocus( const AngleDeg & dir_moment, const double & dist_moment );
 
     /*!
       \brief create change_view command
@@ -405,6 +419,14 @@ public:
           return M_done_turn_neck;
       }
 
+    /*!
+      \brief check if set_focus is performed to update SelfObject
+      \return true if set_focus is performed in previous cycle
+    */
+    bool doneSetFocus() const
+      {
+          return M_done_set_focus;
+      }
     //////////////////////////////////////////////////////////////
 
     // stored action effect getter method
@@ -506,6 +528,23 @@ public:
           return M_turn_neck_moment;
       }
 
+    //////////////////////////////////////////
+    /*!
+      \brief get focus point action effect
+      \return performed focus_point dist moment
+    */
+    double getFocusPointMomentDist() const
+      {
+          return M_focus_point_moment_dist;
+      }
+    /*!
+      \brief get focus point action effect
+      \return performed focus_point dir moment
+    */
+    double getFocusPointMomentDir() const
+      {
+          return M_focus_point_moment_dir;
+      }
     //////////////////////////////////////////
     /*!
       \brief get say action effect

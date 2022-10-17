@@ -56,12 +56,14 @@ ActionEffector::ActionEffector( const PlayerAgent & agent )
     : M_agent( agent ),
       M_command_body( nullptr ),
       M_command_turn_neck( nullptr ),
+      M_command_set_focus( nullptr ),
       M_command_change_view( nullptr ),
       M_command_say( nullptr ),
       M_command_pointto( nullptr ),
       M_command_attentionto( nullptr ),
       M_last_action_time( 0, 0 ),
       M_done_turn_neck( false ),
+      M_done_set_focus( false ),
       M_kick_accel( 0.0, 0.0 ),
       M_kick_accel_error( 0.0, 0.0 ),
       M_turn_actual( 0.0 ),
@@ -109,6 +111,12 @@ ActionEffector::~ActionEffector()
         M_command_turn_neck = nullptr;
     }
 
+    if ( M_command_set_focus )
+    {
+        delete M_command_set_focus;
+        M_command_set_focus = nullptr;
+    }
+
     if ( M_command_change_view )
     {
         delete M_command_change_view;
@@ -152,6 +160,7 @@ ActionEffector::reset()
     }
 
     M_done_turn_neck = false;
+    M_done_set_focus = false;
     M_say_message.erase();
 
     // it is not necesarry to reset these value,
@@ -367,7 +376,24 @@ ActionEffector::checkCommandCount( const BodySensor & sense )
         M_turn_neck_moment = 0.0;
         M_command_counter[PlayerCommand::TURN_NECK] = sense.turnNeckCount();
     }
-
+    if ( sense.turnNeckCount() != M_command_counter[PlayerCommand::TURN_NECK] )
+    {
+        std::cout << M_agent.config().teamName() << ' '
+                  << M_agent.world().self().unum() << ": "
+                  << M_agent.world().time()
+                  << " lost set_focus? at " << M_last_action_time
+                  << " sense=" << sense.setFocusCount()
+                  << " internal=" << M_command_counter[PlayerCommand::SET_FOCUS]
+                  << std::endl;
+        dlog.addText( Logger::SYSTEM,
+                       __FILE__": lost set_focus? sense= %d internal= %d",
+                      sense.setFocusCount(),
+                      M_command_counter[PlayerCommand::SET_FOCUS] );
+        M_done_set_focus = false;
+        M_focus_point_moment_dir = 0.0;
+        M_focus_point_moment_dist = 0.0;
+        M_command_counter[PlayerCommand::SET_FOCUS] = sense.setFocusCount();
+    }
     if ( sense.changeViewCount() != M_command_counter[PlayerCommand::CHANGE_VIEW] )
     {
         std::cout << M_agent.config().teamName() << ' '
@@ -482,6 +508,15 @@ ActionEffector::makeCommand( std::ostream & to )
         M_command_turn_neck = nullptr;
     }
 
+    if ( M_command_set_focus )
+    {
+        M_done_set_focus = true;
+        M_command_set_focus->toCommandString( to );
+        incCommandCount( PlayerCommand::SET_FOCUS );
+        delete M_command_set_focus;
+        M_command_set_focus = nullptr;
+    }
+
     if ( M_command_change_view )
     {
         M_command_change_view->toCommandString( to );
@@ -540,6 +575,12 @@ ActionEffector::clearAllCommands()
     {
         delete M_command_turn_neck;
         M_command_turn_neck = nullptr;
+    }
+
+    if ( M_command_set_focus )
+    {
+        delete M_command_set_focus;
+        M_command_set_focus = nullptr;
     }
 
     if ( M_command_change_view )
@@ -1274,6 +1315,67 @@ ActionEffector::setTurnNeck( const AngleDeg & moment )
 
     // set estimated command effect
     M_turn_neck_moment = command_moment;
+}
+/*-------------------------------------------------------------------*/
+/*!
+
+*/
+void
+ActionEffector::setFocus( const AngleDeg & dir_moment, const double & dist_moment )
+{
+    dlog.addText( Logger::ACTION,
+                   __FILE__" (setFocus) register set_focus. dir_moment=%.1f, dist_moment=%.1f",
+                  dir_moment.degree(), dist_moment );
+
+    double command_dir_moment = dir_moment.degree();
+    double command_dist_moment = dist_moment;
+    AngleDeg next_neck_angle = M_agent.world().self().neck();
+    AngleDeg next_focus_angle = M_agent.world().self().relativeFocusPointDir();
+    double next_focus_dist = M_agent.world().self().relativeFocusPointDist();
+    double next_view_angle = M_agent.world().self().viewWidth().width();
+    next_focus_angle += command_dir_moment;
+    next_focus_dist += command_dist_moment;
+    if ( next_focus_angle.degree() > next_view_angle )
+    {
+        command_dir_moment = rint( next_view_angle
+                                   - M_agent.world().self().relativeFocusPointDir().degree() );
+        dlog.addText( Logger::ACTION,
+                       __FILE__" (setFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
+                      next_focus_angle.degree(), command_dir_moment );
+    }
+    if ( next_focus_angle.degree() < -next_view_angle )
+    {
+        command_dir_moment = rint( -next_view_angle
+                                   - M_agent.world().self().relativeFocusPointDir().degree() );
+        dlog.addText( Logger::ACTION,
+                       __FILE__" (setFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
+                      next_focus_angle.degree(), command_dir_moment );
+    }
+    if ( next_focus_dist > 40.0 )
+    {
+        command_dist_moment = rint( 40.0 - M_agent.world().self().relativeFocusPointDist() );
+        dlog.addText( Logger::ACTION,
+                       __FILE__" (setFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
+                      next_focus_dist, command_dist_moment );
+    }
+    if ( next_focus_dist < 0.0 )
+    {
+        command_dist_moment = rint( 0.0 - M_agent.world().self().relativeFocusPointDist() );
+        dlog.addText( Logger::ACTION,
+                       __FILE__" (setFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
+                      next_focus_dist, command_dist_moment );
+    }
+    // create command object
+    if ( M_command_set_focus )
+    {
+        delete M_command_set_focus;
+        M_command_set_focus = nullptr;
+    }
+    M_command_set_focus = new PlayerSetFocusCommand( command_dir_moment, command_dist_moment );
+
+    // set estimated command effect
+    M_focus_point_moment_dir = command_dir_moment;
+    M_focus_point_moment_dist = command_dist_moment;
 }
 
 /*-------------------------------------------------------------------*/
