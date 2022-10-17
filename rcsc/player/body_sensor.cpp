@@ -59,6 +59,7 @@ BodySensor::BodySensor()
     , M_turn_count( 0 )
     , M_say_count( 0 )
     , M_turn_neck_count( 0 )
+    , M_set_focus_count( 0 )
     , M_catch_count( 0 )
     , M_move_count( 0 )
     , M_change_view_count( 0 )
@@ -78,6 +79,8 @@ BodySensor::BodySensor()
     , M_post_collided( false )
     , M_charged_expires( 0 )
     , M_card( NO_CARD )
+    , M_focus_point_dir( 0.0 )
+    , M_focus_point_dist( 0.0 )
 {
 
 }
@@ -134,6 +137,15 @@ BodySensor::parse1( const char * msg,
     //  (focus (target none) (count 0)) (tackle (expires 0) (count 0))
     //  (collision {none|[(ball)][player][post]}))
     //  (foul (charged 0) (card {none|yellow|red}))
+
+    // ver. 18
+    // (sense_body 66 (view_mode high normal) (stamina 3503.4 1 124000) (speed 0.06 -79)
+    //  (head_angle 89) (kick 4) (dash 20) (turn 24) (say 0) (turn_neck 28) (catch 0)
+    //  (move 1) (change_view 16) (set_focus 10) (arm (movable 0) (expires 0) (target 0 0) (count 0))
+    //  (focus (target none) (count 0)) (tackle (expires 0) (count 0))
+    //  (collision {none|[(ball)][player][post]}))
+    //  (foul (charged 0) (card {none|yellow|red}))
+    //  (focus_point 12.2 14.3)
 
     //char ss[8];
 
@@ -262,6 +274,14 @@ BodySensor::parse1( const char * msg,
     M_change_view_count = static_cast< int >( std::strtol( msg, &next, 10 ) );
     msg = next;
 
+    if ( version >= 18.0 )
+    {
+        while ( *msg != '(' ) ++msg;
+        while ( *msg != ' ' ) ++msg; // skip "(set_focus"
+        M_set_focus_count = static_cast< int >( std::strtol( msg, &next, 10 ) );
+        msg = next;
+    }
+
     if ( version < 8.0 )
     {
         return;
@@ -365,6 +385,21 @@ BodySensor::parse1( const char * msg,
     // (foul (charged 0) (card {none|yellow|red}))
     //
     parseFoul( msg, &next );
+
+    if ( version < 18.0 )
+    {
+        return;
+    }
+    msg = next;
+    //
+    // (set_focus 12.1 13.2)
+    //
+    while ( *msg != '\0' && *msg != '(' ) ++msg;
+    while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip "(focus_point"
+    M_focus_point_dir = std::strtod( msg, &next );
+    msg = next;
+    M_focus_point_dist = std::strtod( msg, &next );
+    msg = next;
 
 }
 
@@ -729,6 +764,7 @@ BodySensor::print( std::ostream & os ) const
        << "\n catch: " << M_catch_count
        << "\n move:  " << M_move_count
        << "\n change_view: " << M_change_view_count
+       << "\n set_focus: " << M_set_focus_count
        << "\n attentionto: " << M_attentionto_count
        << "\n pointto: " << M_pointto_count
        << "\n tackle: " << M_tackle_count
@@ -741,6 +777,8 @@ BodySensor::print( std::ostream & os ) const
        << "\n attentionto-side: " << side_str
        << "\n attentionto-num: " << M_attentionto_unum
        << "\n tackle-expires: " << M_tackle_expires
+       << "\n focus-point-dir: " << M_focus_point_dir
+       << "\n focus-point-dist: " << M_focus_point_dist
 
        << std::endl;
 

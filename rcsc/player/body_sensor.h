@@ -63,6 +63,7 @@ public:
     int M_turn_count; //!< sensed command count
     int M_say_count; //!< sensed command count
     int M_turn_neck_count; //!< sensed command count
+    int M_set_focus_count; //!< sensed command count
     int M_catch_count; //!< sensed command count
     int M_move_count; //!< sensed command count
     int M_change_view_count; //!< sensed command count
@@ -110,6 +111,9 @@ public:
 
     int M_charged_expires; //!< foul charged expire cycle
     Card M_card; //!< yellow/red card
+
+    double M_focus_point_dir; //!< focus point dir to neck
+    double M_focus_point_dist; //!< focus point dist to player
 
 public:
     /*!
@@ -307,6 +311,15 @@ public:
       }
 
     /*!
+      \brief get analyzed set_focus count
+      \return count of performed turn_neck command
+    */
+    int setFocusCount() const
+      {
+          return M_set_focus_count;
+      }
+
+    /*!
       \brief get analyzed catch count
       \return count of performed catch command
     */
@@ -478,6 +491,24 @@ public:
       {
           return M_card;
       }
+
+    /*!
+      \brief
+      \return
+     */
+    double focusPointDir() const
+    {
+        return M_focus_point_dir;
+    }
+
+    /*!
+      \brief
+      \return
+     */
+    double focusPointDist() const
+    {
+        return M_focus_point_dist;
+    }
 
     /*!
       \brief put data to output stream
