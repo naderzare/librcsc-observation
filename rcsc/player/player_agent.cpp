@@ -2909,6 +2909,16 @@ PlayerAgent::doTurnNeck( const AngleDeg & moment )
 
  */
 bool
+PlayerAgent::doSetFocus( const AngleDeg & dir_moment, const double & dist_moment )
+{
+    M_effector.setFocus( dir_moment, dist_moment );
+    return true;
+}
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+bool
 PlayerAgent::doChangeView( const ViewWidth & width )
 {
     if ( M_impl->see_state_.isSynch() )
