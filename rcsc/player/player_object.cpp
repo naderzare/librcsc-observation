@@ -356,6 +356,9 @@ PlayerObject::updateByFullstate( const FullstateSensor::PlayerT & p,
     M_face = p.body_ + p.neck_;
     M_face_count = 0;
 
+    M_focus_point = M_pos + Vector2D::polar2vector(p.focus_point_dist_, p.focus_point_dir_).rotatedVector(M_face);
+    M_focus_count = 0;
+
     M_dist_from_ball = ( M_pos - ball_pos ).r();
     M_angle_from_ball = ( M_pos - ball_pos ).th();
 
