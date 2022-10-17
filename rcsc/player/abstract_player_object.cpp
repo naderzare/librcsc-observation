@@ -70,6 +70,7 @@ AbstractPlayerObject::AbstractPlayerObject( const int id )
       M_body_count( 1000 ),
       M_face( 0.0 ),
       M_face_count( 1000 ),
+      M_focus_count( 1000 ),
       M_pointto_angle( 0.0 ),
       M_pointto_count( 1000 ),
       M_kicking( false ),
@@ -79,7 +80,7 @@ AbstractPlayerObject::AbstractPlayerObject( const int id )
       M_angle_from_self( 0.0 ),
       M_ball_reach_step( 1000 )
 {
-
+    M_focus_point = M_pos;
 }
 
 /*-------------------------------------------------------------------*/
@@ -109,6 +110,7 @@ AbstractPlayerObject::AbstractPlayerObject( const int id,
       M_body_count( 1000 ),
       M_face( 0.0 ),
       M_face_count( 1000 ),
+      M_focus_count( 1000 ),
       M_pointto_angle( 0.0 ),
       M_pointto_count( 1000 ),
       M_kicking( false ),
@@ -122,6 +124,7 @@ AbstractPlayerObject::AbstractPlayerObject( const int id,
     {
         M_unum_count = 0;
     }
+    M_focus_point = M_pos;
 }
 
 /*-------------------------------------------------------------------*/

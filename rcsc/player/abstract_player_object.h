@@ -87,6 +87,9 @@ protected:
     AngleDeg M_face; //!< global neck angle
     int M_face_count; //!< face angle accuracy
 
+    Vector2D M_focus_point; //!< global focus point
+    int M_focus_count; //!< focus point accuracy
+
     AngleDeg M_pointto_angle; //!< global pointing angle
     int M_pointto_count; //!< time count since the last pointto observation
 
@@ -384,6 +387,23 @@ public:
           return M_face_count;
       }
 
+          /*!
+      \brief get global focus point
+      \return const reference to the vector2d object
+    */
+    const Vector2D & focusPoint() const
+      {
+          return M_focus_point; // global focus point
+      }
+
+    /*!
+      \brief get global focus point accuracy
+      \return count from last observation
+    */
+    int focusPointCount() const
+      {
+          return M_focus_count;
+      }
     /*!
       \brief get global pointing angle
       \return const reference to the angle object
