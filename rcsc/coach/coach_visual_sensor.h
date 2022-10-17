@@ -132,10 +132,16 @@ private:
     void parseV6( const char * msg );
 
     /*!
-      \brief analyze see message. v7+
+      \brief analyze see message. v7 to 17
       \param msg server raw message
     */
     void parseV7( const char * msg );
+
+    /*!
+      \brief analyze see message. v18+
+      \param msg server raw message
+    */
+    void parseV18( const char * msg );
 
 public:
 
