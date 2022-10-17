@@ -517,7 +517,6 @@ FullstateSensor::parseV18( const char * msg,
         player.neck_ = std::strtod( msg, &next ); msg = next;
         player.focus_point_dir_ = std::strtod( msg, &next ); msg = next;
         player.focus_point_dist_ = std::strtod( msg, &next ); msg = next;
-        std::cout<<player.unum_<<" "<<player.focus_point_dir_<<" "<<player.focus_point_dist_<<std::endl;
         ++msg;
         if ( *msg != '(' )
         {
