@@ -196,6 +196,8 @@ SelfObject::update( const ActionEffector & act,
     double dash_power = 0.0;
     double turn_moment = 0.0, turn_err = 0.0;
     double neck_moment = 0.0;
+    double focus_dir_moment = 0.0;
+    double focus_dist_moment = 0.0;
 
     /////////////////////////////////////////
     // base command
@@ -255,6 +257,14 @@ SelfObject::update( const ActionEffector & act,
         M_neck = ServerParam::i().minNeckAngle();
     }
 
+    // focus point
+    if ( act.doneSetFocus() )
+    {
+        focus_dir_moment = act.getFocusPointMomentDir();
+        focus_dist_moment = act.getFocusPointMomentDist();
+    }
+    M_relative_focus_point_dir += focus_dir_moment;
+    M_relative_focus_point_dist += focus_dist_moment;
     // stamina
     M_stamina.simulateDash( playerType(), dash_power );
 
@@ -496,6 +506,12 @@ SelfObject::updateAfterSenseBody( const BodySensor & sense,
     {
         M_neck = sense.neckDir();
     }
+    // focus point relative
+    // The relative focus information should not be updated if the player version is less than 18
+    // M_relative_focus_point_dir = std::min(M_relative_focus_point_dir.degree(), M_view_width.width() / 2.0);
+
+    M_relative_focus_point_dir = sense.focusPointDir();
+    M_relative_focus_point_dist = sense.focusPointDist();
 
     //
     // collision
@@ -554,6 +570,7 @@ SelfObject::updateAfterSenseBody( const BodySensor & sense,
         ////////////////////////////////////////////////////
         // face
         M_face = M_body + M_neck;
+        M_focus_point = M_pos + Vector2D::polar2vector(M_relative_focus_point_dist, M_face + M_relative_focus_point_dir);
 
         ////////////////////////////////////////////////////
         // vel
@@ -764,7 +781,8 @@ SelfObject::updateAfterFullstate( const FullstateSensor::PlayerT & my_state,
     M_face = M_body + M_neck;
     M_face_error = 0.0;
     M_face_count = 0;
-
+    M_focus_point = M_pos + Vector2D::polar2vector(M_relative_focus_point_dist, M_face + M_relative_focus_point_dir);
+    M_focus_count = 0;
     M_stamina.setValues( my_state.stamina_,
                          my_state.effort_,
                          my_state.recovery_,
