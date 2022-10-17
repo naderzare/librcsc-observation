@@ -73,6 +73,9 @@ private:
     AngleDeg M_neck; //!< relative neck angle
     double M_face_error; //!< estimated error of angle info
 
+    AngleDeg M_relative_focus_point_dir; //!< relative focus point angle to neck
+    double M_relative_focus_point_dist; //!< relative focus point dist to player pos
+
     ViewWidth M_view_width; //!< current view width type
     ViewQuality M_view_quality; //!< current view quality type
 
@@ -249,6 +252,24 @@ public:
           return M_face_error;
       }
 
+
+    /*!
+      \brief get estimated focus point relative to neck angle and player pos
+      \return const reference to the angle object
+    */
+    const AngleDeg & relativeFocusPointDir() const
+      {
+          return M_relative_focus_point_dir;
+      }
+
+    /*!
+      \brief get estimated focus point relative to neck angle and player pos
+      \return const reference to the double
+    */
+    const double & relativeFocusPointDist() const
+      {
+          return M_relative_focus_point_dist;
+      }
     /*!
       \brief get current view width
       \return const reference to the view width object
