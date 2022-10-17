@@ -253,6 +253,20 @@ PlayerType::PlayerType( const int id,
                            PP.catchAreaLengthStretchMax() );
         M_catchable_area_l_stretch = tmp_delta;
 
+        //v18
+        double maximum_dist_in_pitch = SP.maxDistInPitch();
+        M_unum_far_length = 20.0;
+        M_unum_too_far_length = 40.0;
+        M_team_far_length = maximum_dist_in_pitch;  // was 40.0 updated by Nader Zare in 2022-10-13
+        M_team_too_far_length = maximum_dist_in_pitch;  // was 60.0 updated by Nader Zare in 2022-10-13
+        M_player_max_observation_length = maximum_dist_in_pitch;
+        M_ball_vel_far_length = 20;
+        M_ball_vel_too_far_length = 40;
+        M_ball_max_observation_length = maximum_dist_in_pitch;
+        M_flag_chg_far_length = 20;
+        M_flag_chg_too_far_length = 40;
+        M_flag_max_observation_length = maximum_dist_in_pitch;
+
         //
         double real_speed_max
             = ( SP.maxPower() * M_dash_power_rate * M_effort_max )
@@ -325,6 +339,16 @@ PlayerType::toServerString() const
        << "(kick_power_rate " << M_kick_power_rate << ')'
        << "(foul_detect_probability " << M_foul_detect_probability << ')'
        << "(catchable_area_l_stretch " << M_catchable_area_l_stretch << ')'
+       << "(unum_too_far_length " << M_unum_too_far_length << ')'
+       << "(team_far_length " << M_team_far_length << ')'
+       << "(team_too_far_length " << M_team_too_far_length << ')'
+       << "(player_max_observation_length " << M_player_max_observation_length << ')'
+       << "(ball_vel_far_length " << M_ball_vel_far_length << ')'
+       << "(ball_vel_too_far_length " << M_ball_vel_too_far_length << ')'
+       << "(ball_max_observation_length " << M_ball_max_observation_length << ')'
+       << "(flag_chg_far_length " << M_flag_chg_far_length << ')'
+       << "(flag_chg_too_far_length " << M_flag_chg_too_far_length << ')'
+       << "(flag_max_observation_length " << M_flag_max_observation_length << ')'
        << ')';
 
     return os.str();
@@ -353,6 +377,16 @@ PlayerType::setDefault()
     M_kick_power_rate = SP.kickPowerRate();
     M_foul_detect_probability = SP.foulDetectProbability();
     M_catchable_area_l_stretch = 1.0;
+    M_unum_far_length = 20.0;
+    M_unum_too_far_length = 40.0;
+    M_team_far_length = SP.maxDistInPitch();
+    M_team_too_far_length = SP.maxDistInPitch();
+    M_player_max_observation_length = SP.maxDistInPitch();
+    M_ball_vel_far_length = 20;
+    M_ball_vel_too_far_length = 40;
+    M_ball_max_observation_length = SP.maxDistInPitch();
+    M_flag_chg_far_length = 20;
+    M_flag_chg_too_far_length = 40;
 }
 
 /*-------------------------------------------------------------------*/
@@ -462,6 +496,50 @@ PlayerType::parseV8( const char * msg )
         else if ( ! std::strcmp( name, "catchable_area_l_stretch" ) )
         {
             M_catchable_area_l_stretch = val;
+        }
+        else if ( ! std::strcmp( name, "unum_far_length" ) )
+        {
+            M_unum_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "unum_too_far_length" ) )
+        {
+            M_unum_too_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "team_far_length" ) )
+        {
+            M_team_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "team_too_far_length" ) )
+        {
+            M_team_too_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "player_max_observation_length" ) )
+        {
+            M_player_max_observation_length = val;
+        }
+        else if ( ! std::strcmp( name, "ball_vel_far_length" ) )
+        {
+            M_ball_vel_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "ball_vel_too_far_length" ) )
+        {
+            M_ball_vel_too_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "ball_max_observation_length" ) )
+        {
+            M_ball_max_observation_length = val;
+        }
+        else if ( ! std::strcmp( name, "flag_chg_far_length" ) )
+        {
+            M_flag_chg_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "flag_chg_too_far_length" ) )
+        {
+            M_flag_chg_too_far_length = val;
+        }
+        else if ( ! std::strcmp( name, "flag_max_observation_length" ) )
+        {
+            M_flag_max_observation_length = val;
         }
         else
         {

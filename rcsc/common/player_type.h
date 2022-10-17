@@ -65,7 +65,18 @@ private:
     double M_kick_power_rate; //!< kick power rate
     double M_foul_detect_probability; //!< foul detect probability
     double M_catchable_area_l_stretch; //!< catch area length stretch factor
-
+    // v18
+    double M_unum_far_length; //!<
+    double M_unum_too_far_length; //!<
+    double M_team_far_length; //!<
+    double M_team_too_far_length; //!<
+    double M_player_max_observation_length; //!<
+    double M_ball_vel_far_length; //!<
+    double M_ball_vel_too_far_length; //!<
+    double M_ball_max_observation_length; //!<
+    double M_flag_chg_far_length; //!<
+    double M_flag_chg_too_far_length; //!<
+    double M_flag_max_observation_length; //!<
     //
     // additional parameters
     //
@@ -300,6 +311,94 @@ public:
           return M_catchable_area_l_stretch;
       }
 
+    /*!
+      \brief
+      \return
+     */
+     double unumFarLength() const
+      {
+          return M_unum_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double unumTooFarLength() const
+      {
+          return M_unum_too_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double teamFarLength() const
+      {
+          return M_team_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double teamTooFarLength() const
+      {
+          return M_team_too_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double playerMaxObservationLength() const
+      {
+          return M_player_max_observation_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double ballVelFarLength() const
+      {
+          return M_ball_vel_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double ballVelTooFarLength() const
+      {
+          return M_ball_vel_too_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double ballMaxObservationLength() const
+      {
+          return M_ball_max_observation_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double flagChgFarLength() const
+      {
+          return M_flag_chg_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double flagChgTooFarLength() const
+      {
+          return M_flag_chg_too_far_length;
+      }
+    /*!
+      \brief
+      \return
+     */
+     double flagMaxObservationLength() const
+      {
+          return M_flag_max_observation_length;
+      }
     ////////////////////////////////////////////////
     // additional parameters
 
