@@ -204,6 +204,17 @@ PlayerTurnNeckCommand::toCommandString( std::ostream & to ) const
 
 */
 std::ostream &
+PlayerSetFocusCommand::toCommandString( std::ostream & to ) const
+{
+    return to << "(set_focus " << M_dir_moment << " " << M_dist_moment << ")";
+}
+
+
+/*-------------------------------------------------------------------*/
+/*!
+
+*/
+std::ostream &
 PlayerChangeViewCommand::toCommandString( std::ostream & to ) const
 {
     to << "(change_view " << M_width.str();

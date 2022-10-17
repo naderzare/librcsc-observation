@@ -65,6 +65,7 @@ public:
         TACKLE,
         // support commands
         TURN_NECK,
+        SET_FOCUS,
         CHANGE_VIEW,
         SAY,
         POINTTO,
@@ -836,6 +837,76 @@ public:
       }
 };
 
+//////////////////////////////////////////////////////////////////////
+/*!
+  \class PlayerSetFocusCommand
+  \brief player's set focus command
+
+  <pre>
+  Format:
+  <- (set_focus <dir_moment> <dist_moment>)
+  </pre>
+*/
+class PlayerSetFocusCommand
+    : public PlayerSupportCommand {
+private:
+    double M_dir_moment; //!< dir moment to focus point
+    double M_dist_moment; //!< dist moment to focus point
+public:
+    /*!
+      \brief construct with moment to set focus point
+      \param moment set focus dir and dist moment
+    */
+    explicit
+    PlayerSetFocusCommand( const double & dir_moment, const double & dist_moment )
+        : M_dir_moment( dir_moment ),
+          M_dist_moment ( dist_moment)
+      { }
+
+    /*!
+      \brief get command type
+      \return command type Id
+    */
+    Type type() const
+      {
+          return SET_FOCUS;
+      }
+
+    /*!
+      \brief put command string to ostream
+      \param to reference to the output stream
+      \return reference to the output stream
+    */
+    std::ostream & toCommandString( std::ostream & to ) const;
+
+    /*!
+      \brief get command name
+      \return command name string
+    */
+    std::string name() const
+      {
+          return std::string( "set_focus" );
+      }
+
+    /*!
+      \brief get command paramter
+      \return dir moment of this command
+    */
+    const
+    double & dir_moment() const
+      {
+          return M_dir_moment;
+      }
+    /*!
+      \brief get command paramter
+      \return dist moment of this command
+    */
+    const
+    double & dist_moment() const
+      {
+          return M_dist_moment;
+      }
+};
 //////////////////////////////////////////////////////////////////////
 /*!
   \class PlayerChangeViewCommand
