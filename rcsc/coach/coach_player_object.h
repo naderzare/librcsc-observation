@@ -72,6 +72,8 @@ private:
     AngleDeg M_body; //!< body angle
     AngleDeg M_face; //!< global neck angle
 
+    Vector2D M_focus_point; //!< global focus point
+
     StaminaModel M_stamina; //!< (heared or estimated) stamina value
 
     int M_pointto_cycle; //< if player is pointing, this value in incremented
@@ -188,6 +190,15 @@ public:
     const AngleDeg & face() const
       {
           return M_face;
+      }
+
+    /*!
+      \brief get player's global focus point
+      \return const reference to the focus point variable
+     */
+    const Vector2D & focusPoint() const
+      {
+          return M_focus_point;
       }
 
     /*!
@@ -394,6 +405,17 @@ public:
       }
 
     /*!
+      \brief set body and neck angle with seen information
+      \param b seen body angle
+      \param n seen neck angle relative to body
+     */
+    void setFocusPoint( const double focus_point_dir,
+                        const double focus_point_dist )
+      {
+          M_focus_point = M_pos + Vector2D::polar2vector(focus_point_dist, focus_point_dir + M_face);
+      }
+
+    /*!
       \brief set player's stamina information
       \param s new stamina value
      */
@@ -501,6 +523,7 @@ public:
           M_vel.reverse();
           M_body += 180.0;
           M_face += 180.0;
+          M_focus_point.reverse();
           if ( isPointing() ) M_pointto_angle += 180.0;
       }
 

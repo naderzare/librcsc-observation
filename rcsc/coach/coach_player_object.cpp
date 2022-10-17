@@ -55,6 +55,7 @@ CoachPlayerObject::CoachPlayerObject()
       M_vel( 0.0, 0.0 ),
       M_body( 0.0 ),
       M_face( 0.0 ),
+      M_focus_point( Vector2D::INVALIDATED ),
       M_stamina(),
       M_pointto_cycle( 0 ),
       M_pointto_angle( 0.0 ),
@@ -150,6 +151,8 @@ CoachPlayerObject::update( const CoachPlayerObject & p )
 
     M_body = p.body();
     M_face = p.face();
+
+    M_focus_point = p.focusPoint();
 
     if ( p.isPointing() )
     {
