@@ -1151,6 +1151,11 @@ public:
           return pitchWidth() * 0.5;
       }
 
+    double maxDistInPitch() const
+      {
+          return sqrt(pow(pitchLength(), 2.0) + pow(pitchWidth(), 2.0));
+      }
+
     double penaltyAreaHalfWidth() const
       {
           return penaltyAreaWidth() * 0.5;
