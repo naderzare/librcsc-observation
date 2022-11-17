@@ -409,8 +409,8 @@ public:
       \param b seen body angle
       \param n seen neck angle relative to body
      */
-    void setFocusPoint( const double focus_point_dir,
-                        const double focus_point_dist )
+    void setFocusPoint( const double focus_point_dist,
+                        const double focus_point_dir )
       {
           M_focus_point = M_pos + Vector2D::polar2vector(focus_point_dist, focus_point_dir + M_face);
       }

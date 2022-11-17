@@ -2909,9 +2909,9 @@ PlayerAgent::doTurnNeck( const AngleDeg & moment )
 
  */
 bool
-PlayerAgent::doSetFocus( const AngleDeg & dir_moment, const double & dist_moment )
+PlayerAgent::doSetFocus( const double & dist_moment, const AngleDeg & dir_moment )
 {
-    M_effector.setFocus( dir_moment, dist_moment );
+    M_effector.setFocus( dist_moment, dir_moment );
     return true;
 }
 /*-------------------------------------------------------------------*/

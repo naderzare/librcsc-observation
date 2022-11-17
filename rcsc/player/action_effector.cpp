@@ -1321,11 +1321,11 @@ ActionEffector::setTurnNeck( const AngleDeg & moment )
 
 */
 void
-ActionEffector::setFocus( const AngleDeg & dir_moment, const double & dist_moment )
+ActionEffector::setFocus( const double & dist_moment, const AngleDeg & dir_moment )
 {
     dlog.addText( Logger::ACTION,
-                   __FILE__" (setFocus) register set_focus. dir_moment=%.1f, dist_moment=%.1f",
-                  dir_moment.degree(), dist_moment );
+                   __FILE__" (setFocus) register set_focus. dist_moment=%.1f, dir_moment=%.1f",
+                  dist_moment, dir_moment.degree() );
 
     double command_dir_moment = dir_moment.degree();
     double command_dist_moment = dist_moment;

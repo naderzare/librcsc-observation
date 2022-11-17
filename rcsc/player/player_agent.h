@@ -264,7 +264,7 @@ public:
       \param dist_moment focus point dist moment
       \return true if successfully registered.
     */
-    bool doSetFocus( const AngleDeg & dir_moment, const double & dist_moment );
+    bool doSetFocus( const double & dist_moment, const AngleDeg & dir_moment );
 
     /*!
       \brief register change_view command.

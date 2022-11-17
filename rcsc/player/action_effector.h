@@ -318,11 +318,11 @@ public:
     void setTurnNeck( const AngleDeg & moment );
     /*!
       \brief create set_focus command and its effect with set_focus parameter
-      \param moment set_focus dir moment and dist moment that player wants to focus
+      \param moment set_focus dist moment and dir moment that player wants to focus
 
       command argument moment is normalized by server parameter.
     */
-    void setFocus( const AngleDeg & dir_moment, const double & dist_moment );
+    void setFocus( const double & dist_moment, const AngleDeg & dir_moment );
 
     /*!
       \brief create change_view command

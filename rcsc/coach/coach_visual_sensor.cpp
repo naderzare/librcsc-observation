@@ -325,7 +325,7 @@ CoachVisualSensor::parseV18( const char * msg )
     /*
     sample version >= 7.0
     (see_global TIME ((g l) -52.5 0) ((g r) 52.5 0) ((b) <x> <y> <vx> <vy>)
-       ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dir> <focus_point_dist>[ <arm>][ {t|k|f}][ {y|r}])
+       ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dist> <focus_point_dir>[ <arm>][ {t|k|f}][ {y|r}])
        ....)
         <-- arm is global
         <-- 't' means tackle
@@ -334,12 +334,12 @@ CoachVisualSensor::parseV18( const char * msg )
         <-- 'y' means yellow card
         <-- 'r' means red card
     (ok look TIME ((g l) -52.5 0) ((g r) 52.5 0) ((b) <x> <y> <vx> <vy>)
-       ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dir> <focus_point_dist>) <-- no arm & tackle
+       ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dist> <focus_point_dir>) <-- no arm & tackle
        ....)
    */
 
     // temporal variables
-    double x, y, vx, vy, body, neck, focus_point_dir, focus_point_dist;
+    double x, y, vx, vy, body, neck, focus_point_dist, focus_point_dir;
 
     if ( std::strncmp( msg, "(see_global ", 12 ) )
     {
@@ -390,7 +390,7 @@ CoachVisualSensor::parseV18( const char * msg )
     std::string team_name_left;
     std::string team_name_right;
 
-    // ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dir> <focus_point_dist>[ <arm>][ {k|t}][ {y|r}])
+    // ((p "TEAM" UNUM[ goalie]) <x> <y> <vx> <vy> <body> <neck> <focus_point_dist> <focus_point_dir>[ <arm>][ {k|t}][ {y|r}])
     while ( *msg != '\0' )
     {
         while ( *msg != '\0' && *msg != '(' ) ++msg;
@@ -456,7 +456,7 @@ CoachVisualSensor::parseV18( const char * msg )
 
         if ( std::sscanf( msg,
                           " %lf %lf %lf %lf %lf %lf %lf %lf %n ",
-                          &x, &y, &vx, &vy, &body, &neck, &focus_point_dir, &focus_point_dist, &n_read ) != 8 )
+                          &x, &y, &vx, &vy, &body, &neck, &focus_point_dist, &focus_point_dir, &n_read ) != 8 )
         {
             std::cerr << __FILE__ << ' ' << __LINE__
                       << "***ERROR*** invalide message(5) [" << msg << ']'
@@ -468,7 +468,7 @@ CoachVisualSensor::parseV18( const char * msg )
         player.setPos( x, y );
         player.setVel( vx, vy );
         player.setAngle( body, neck );
-        player.setFocusPoint( focus_point_dir, focus_point_dist);
+        player.setFocusPoint( focus_point_dist, focus_point_dir );
 
         msg += n_read;
 

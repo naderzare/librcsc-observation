@@ -844,7 +844,7 @@ public:
 
   <pre>
   Format:
-  <- (set_focus <dir_moment> <dist_moment>)
+  <- (set_focus <dist_moment> <dir_moment>)
   </pre>
 */
 class PlayerSetFocusCommand
@@ -858,7 +858,7 @@ public:
       \param moment set focus dir and dist moment
     */
     explicit
-    PlayerSetFocusCommand( const double & dir_moment, const double & dist_moment )
+    PlayerSetFocusCommand( const double & dist_moment, const double & dir_moment )
         : M_dir_moment( dir_moment ),
           M_dist_moment ( dist_moment)
       { }

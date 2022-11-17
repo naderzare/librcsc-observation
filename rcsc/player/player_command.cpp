@@ -206,7 +206,7 @@ PlayerTurnNeckCommand::toCommandString( std::ostream & to ) const
 std::ostream &
 PlayerSetFocusCommand::toCommandString( std::ostream & to ) const
 {
-    return to << "(set_focus " << M_dir_moment << " " << M_dist_moment << ")";
+    return to << "(set_focus " << M_dist_moment << " " << M_dir_moment << ")";
 }
 
 

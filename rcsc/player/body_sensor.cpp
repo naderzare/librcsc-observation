@@ -396,9 +396,9 @@ BodySensor::parse1( const char * msg,
     //
     while ( *msg != '\0' && *msg != '(' ) ++msg;
     while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip "(focus_point"
-    M_focus_point_dir = std::strtod( msg, &next );
-    msg = next;
     M_focus_point_dist = std::strtod( msg, &next );
+    msg = next;
+    M_focus_point_dir = std::strtod( msg, &next );
     msg = next;
 
 }
@@ -777,8 +777,8 @@ BodySensor::print( std::ostream & os ) const
        << "\n attentionto-side: " << side_str
        << "\n attentionto-num: " << M_attentionto_unum
        << "\n tackle-expires: " << M_tackle_expires
-       << "\n focus-point-dir: " << M_focus_point_dir
        << "\n focus-point-dist: " << M_focus_point_dist
+       << "\n focus-point-dir: " << M_focus_point_dir
 
        << std::endl;
 
