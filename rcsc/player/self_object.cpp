@@ -258,7 +258,7 @@ SelfObject::update( const ActionEffector & act,
     }
 
     // focus point
-    if ( act.doneSetFocus() )
+    if ( act.doneChangeFocus() )
     {
         focus_dir_moment = act.getFocusPointMomentDir();
         focus_dist_moment = act.getFocusPointMomentDist();

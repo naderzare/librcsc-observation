@@ -259,12 +259,12 @@ public:
     bool doTurnNeck( const AngleDeg & moment );
 
     /*!
-      \brief register set_focus command.
+      \brief register change_focus command.
       \param dir_moment focus point dir moment
       \param dist_moment focus point dist moment
       \return true if successfully registered.
     */
-    bool doSetFocus( const double & dist_moment, const AngleDeg & dir_moment );
+    bool doChangeFocus( const double & dist_moment, const AngleDeg & dir_moment );
 
     /*!
       \brief register change_view command.

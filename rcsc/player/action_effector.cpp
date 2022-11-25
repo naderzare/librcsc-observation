@@ -56,14 +56,14 @@ ActionEffector::ActionEffector( const PlayerAgent & agent )
     : M_agent( agent ),
       M_command_body( nullptr ),
       M_command_turn_neck( nullptr ),
-      M_command_set_focus( nullptr ),
+      M_command_change_focus( nullptr ),
       M_command_change_view( nullptr ),
       M_command_say( nullptr ),
       M_command_pointto( nullptr ),
       M_command_attentionto( nullptr ),
       M_last_action_time( 0, 0 ),
       M_done_turn_neck( false ),
-      M_done_set_focus( false ),
+      M_done_change_focus( false ),
       M_kick_accel( 0.0, 0.0 ),
       M_kick_accel_error( 0.0, 0.0 ),
       M_turn_actual( 0.0 ),
@@ -111,10 +111,10 @@ ActionEffector::~ActionEffector()
         M_command_turn_neck = nullptr;
     }
 
-    if ( M_command_set_focus )
+    if ( M_command_change_focus )
     {
-        delete M_command_set_focus;
-        M_command_set_focus = nullptr;
+        delete M_command_change_focus;
+        M_command_change_focus = nullptr;
     }
 
     if ( M_command_change_view )
@@ -160,7 +160,7 @@ ActionEffector::reset()
     }
 
     M_done_turn_neck = false;
-    M_done_set_focus = false;
+    M_done_change_focus = false;
     M_say_message.erase();
 
     // it is not necesarry to reset these value,
@@ -381,18 +381,18 @@ ActionEffector::checkCommandCount( const BodySensor & sense )
         std::cout << M_agent.config().teamName() << ' '
                   << M_agent.world().self().unum() << ": "
                   << M_agent.world().time()
-                  << " lost set_focus? at " << M_last_action_time
-                  << " sense=" << sense.setFocusCount()
-                  << " internal=" << M_command_counter[PlayerCommand::SET_FOCUS]
+                  << " lost change_focus? at " << M_last_action_time
+                  << " sense=" << sense.changeFocusCount()
+                  << " internal=" << M_command_counter[PlayerCommand::CHANGE_FOCUS]
                   << std::endl;
         dlog.addText( Logger::SYSTEM,
-                       __FILE__": lost set_focus? sense= %d internal= %d",
-                      sense.setFocusCount(),
-                      M_command_counter[PlayerCommand::SET_FOCUS] );
-        M_done_set_focus = false;
+                       __FILE__": lost change_focus? sense= %d internal= %d",
+                      sense.changeFocusCount(),
+                      M_command_counter[PlayerCommand::CHANGE_FOCUS] );
+        M_done_change_focus = false;
         M_focus_point_moment_dir = 0.0;
         M_focus_point_moment_dist = 0.0;
-        M_command_counter[PlayerCommand::SET_FOCUS] = sense.setFocusCount();
+        M_command_counter[PlayerCommand::CHANGE_FOCUS] = sense.changeFocusCount();
     }
     if ( sense.changeViewCount() != M_command_counter[PlayerCommand::CHANGE_VIEW] )
     {
@@ -508,13 +508,13 @@ ActionEffector::makeCommand( std::ostream & to )
         M_command_turn_neck = nullptr;
     }
 
-    if ( M_command_set_focus )
+    if ( M_command_change_focus )
     {
-        M_done_set_focus = true;
-        M_command_set_focus->toCommandString( to );
-        incCommandCount( PlayerCommand::SET_FOCUS );
-        delete M_command_set_focus;
-        M_command_set_focus = nullptr;
+        M_done_change_focus = true;
+        M_command_change_focus->toCommandString( to );
+        incCommandCount( PlayerCommand::CHANGE_FOCUS );
+        delete M_command_change_focus;
+        M_command_change_focus = nullptr;
     }
 
     if ( M_command_change_view )
@@ -577,10 +577,10 @@ ActionEffector::clearAllCommands()
         M_command_turn_neck = nullptr;
     }
 
-    if ( M_command_set_focus )
+    if ( M_command_change_focus )
     {
-        delete M_command_set_focus;
-        M_command_set_focus = nullptr;
+        delete M_command_change_focus;
+        M_command_change_focus = nullptr;
     }
 
     if ( M_command_change_view )
@@ -1321,10 +1321,10 @@ ActionEffector::setTurnNeck( const AngleDeg & moment )
 
 */
 void
-ActionEffector::setFocus( const double & dist_moment, const AngleDeg & dir_moment )
+ActionEffector::changeFocus( const double & dist_moment, const AngleDeg & dir_moment )
 {
     dlog.addText( Logger::ACTION,
-                   __FILE__" (setFocus) register set_focus. dist_moment=%.1f, dir_moment=%.1f",
+                   __FILE__" (changeFocus) register change_focus. dist_moment=%.1f, dir_moment=%.1f",
                   dist_moment, dir_moment.degree() );
 
     double command_dir_moment = dir_moment.degree();
@@ -1340,7 +1340,7 @@ ActionEffector::setFocus( const double & dist_moment, const AngleDeg & dir_momen
         command_dir_moment = rint( next_view_angle
                                    - M_agent.world().self().relativeFocusPointDir().degree() );
         dlog.addText( Logger::ACTION,
-                       __FILE__" (setFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
+                       __FILE__" (changeFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
                       next_focus_angle.degree(), command_dir_moment );
     }
     if ( next_focus_angle.degree() < -next_view_angle )
@@ -1348,30 +1348,30 @@ ActionEffector::setFocus( const double & dist_moment, const AngleDeg & dir_momen
         command_dir_moment = rint( -next_view_angle
                                    - M_agent.world().self().relativeFocusPointDir().degree() );
         dlog.addText( Logger::ACTION,
-                       __FILE__" (setFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
+                       __FILE__" (changeFocus) next_focus_dir= %.1f. over max. new-dir-moment= %.1f",
                       next_focus_angle.degree(), command_dir_moment );
     }
     if ( next_focus_dist > 40.0 )
     {
         command_dist_moment = rint( 40.0 - M_agent.world().self().relativeFocusPointDist() );
         dlog.addText( Logger::ACTION,
-                       __FILE__" (setFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
+                       __FILE__" (changeFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
                       next_focus_dist, command_dist_moment );
     }
     if ( next_focus_dist < 0.0 )
     {
         command_dist_moment = rint( 0.0 - M_agent.world().self().relativeFocusPointDist() );
         dlog.addText( Logger::ACTION,
-                       __FILE__" (setFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
+                       __FILE__" (changeFocus) next_focus_dist= %.1f. over max. new-dist-moment= %.1f",
                       next_focus_dist, command_dist_moment );
     }
     // create command object
-    if ( M_command_set_focus )
+    if ( M_command_change_focus )
     {
-        delete M_command_set_focus;
-        M_command_set_focus = nullptr;
+        delete M_command_change_focus;
+        M_command_change_focus = nullptr;
     }
-    M_command_set_focus = new PlayerSetFocusCommand( command_dir_moment, command_dist_moment );
+    M_command_change_focus = new PlayerChangeFocusCommand( command_dir_moment, command_dist_moment );
 
     // set estimated command effect
     M_focus_point_moment_dir = command_dir_moment;

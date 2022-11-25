@@ -65,7 +65,7 @@ public:
         TACKLE,
         // support commands
         TURN_NECK,
-        SET_FOCUS,
+        CHANGE_FOCUS,
         CHANGE_VIEW,
         SAY,
         POINTTO,
@@ -839,15 +839,15 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 /*!
-  \class PlayerSetFocusCommand
+  \class PlayerChangeFocusCommand
   \brief player's set focus command
 
   <pre>
   Format:
-  <- (set_focus <dist_moment> <dir_moment>)
+  <- (change_focus <dist_moment> <dir_moment>)
   </pre>
 */
-class PlayerSetFocusCommand
+class PlayerChangeFocusCommand
     : public PlayerSupportCommand {
 private:
     double M_dir_moment; //!< dir moment to focus point
@@ -858,7 +858,7 @@ public:
       \param moment set focus dir and dist moment
     */
     explicit
-    PlayerSetFocusCommand( const double & dist_moment, const double & dir_moment )
+    PlayerChangeFocusCommand( const double & dist_moment, const double & dir_moment )
         : M_dir_moment( dir_moment ),
           M_dist_moment ( dist_moment)
       { }
@@ -869,7 +869,7 @@ public:
     */
     Type type() const
       {
-          return SET_FOCUS;
+          return CHANGE_FOCUS;
       }
 
     /*!
@@ -885,7 +885,7 @@ public:
     */
     std::string name() const
       {
-          return std::string( "set_focus" );
+          return std::string( "change_focus" );
       }
 
     /*!

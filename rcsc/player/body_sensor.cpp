@@ -59,7 +59,7 @@ BodySensor::BodySensor()
     , M_turn_count( 0 )
     , M_say_count( 0 )
     , M_turn_neck_count( 0 )
-    , M_set_focus_count( 0 )
+    , M_change_focus_count( 0 )
     , M_catch_count( 0 )
     , M_move_count( 0 )
     , M_change_view_count( 0 )
@@ -141,7 +141,7 @@ BodySensor::parse1( const char * msg,
     // ver. 18
     // (sense_body 66 (view_mode high normal) (stamina 3503.4 1 124000) (speed 0.06 -79)
     //  (head_angle 89) (kick 4) (dash 20) (turn 24) (say 0) (turn_neck 28) (catch 0)
-    //  (move 1) (change_view 16) (set_focus 10) (arm (movable 0) (expires 0) (target 0 0) (count 0))
+    //  (move 1) (change_view 16) (change_focus 10) (arm (movable 0) (expires 0) (target 0 0) (count 0))
     //  (focus (target none) (count 0)) (tackle (expires 0) (count 0))
     //  (collision {none|[(ball)][player][post]}))
     //  (foul (charged 0) (card {none|yellow|red}))
@@ -277,8 +277,8 @@ BodySensor::parse1( const char * msg,
     if ( version >= 18.0 )
     {
         while ( *msg != '(' ) ++msg;
-        while ( *msg != ' ' ) ++msg; // skip "(set_focus"
-        M_set_focus_count = static_cast< int >( std::strtol( msg, &next, 10 ) );
+        while ( *msg != ' ' ) ++msg; // skip "(change_focus"
+        M_change_focus_count = static_cast< int >( std::strtol( msg, &next, 10 ) );
         msg = next;
     }
 
@@ -392,7 +392,7 @@ BodySensor::parse1( const char * msg,
     }
     msg = next;
     //
-    // (set_focus 12.1 13.2)
+    // (change_focus 12.1 13.2)
     //
     while ( *msg != '\0' && *msg != '(' ) ++msg;
     while ( *msg != '\0' && *msg != ' ' ) ++msg; // skip "(focus_point"
@@ -764,7 +764,7 @@ BodySensor::print( std::ostream & os ) const
        << "\n catch: " << M_catch_count
        << "\n move:  " << M_move_count
        << "\n change_view: " << M_change_view_count
-       << "\n set_focus: " << M_set_focus_count
+       << "\n change_focus: " << M_change_focus_count
        << "\n attentionto: " << M_attentionto_count
        << "\n pointto: " << M_pointto_count
        << "\n tackle: " << M_tackle_count

@@ -370,7 +370,7 @@ FullstateSensor::parseV18( const char * msg,
         (vmode {high|low} {narrow|normal|high})
         //(stamina <stamina> <effort> <recovery>)
         (count <kicks> <dashes> <turns> <catches> <moves>
-               <turn_necks> <change_views> <says> <set_focus>)
+               <turn_necks> <change_views> <says> <change_focus>)
         (arm (movable <MOVABLE>) (expires <EXPIRES>)
         (target <DIST> <DIR>) (count <COUNT>))
         (score <team_points> <enemy_points>)

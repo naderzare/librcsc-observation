@@ -63,7 +63,7 @@ public:
     int M_turn_count; //!< sensed command count
     int M_say_count; //!< sensed command count
     int M_turn_neck_count; //!< sensed command count
-    int M_set_focus_count; //!< sensed command count
+    int M_change_focus_count; //!< sensed command count
     int M_catch_count; //!< sensed command count
     int M_move_count; //!< sensed command count
     int M_change_view_count; //!< sensed command count
@@ -311,12 +311,12 @@ public:
       }
 
     /*!
-      \brief get analyzed set_focus count
+      \brief get analyzed change_focus count
       \return count of performed turn_neck command
     */
-    int setFocusCount() const
+    int changeFocusCount() const
       {
-          return M_set_focus_count;
+          return M_change_focus_count;
       }
 
     /*!

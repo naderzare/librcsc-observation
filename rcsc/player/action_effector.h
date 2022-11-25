@@ -63,8 +63,8 @@ private:
 
     //! pointer of turn_neck for dynamic allocation
     PlayerTurnNeckCommand * M_command_turn_neck;
-    //! pointer of set_focus for dynamic allocation
-    PlayerSetFocusCommand * M_command_set_focus;
+    //! pointer of change_focus for dynamic allocation
+    PlayerChangeFocusCommand * M_command_change_focus;
     //! pointer of change_view for dynamic allocation
     PlayerChangeViewCommand * M_command_change_view;
     //! pointer of say for dynamic allocation
@@ -86,8 +86,8 @@ private:
 
     //! checker of turn_neck. true if turn_neck was done at last
     bool M_done_turn_neck;
-    //! checker of set_focus. true if turn_neck was done at last
-    bool M_done_set_focus;
+    //! checker of change_focus. true if turn_neck was done at last
+    bool M_done_change_focus;
     // stored last action effect variables
 
     // kick effect
@@ -317,12 +317,12 @@ public:
     */
     void setTurnNeck( const AngleDeg & moment );
     /*!
-      \brief create set_focus command and its effect with set_focus parameter
-      \param moment set_focus dist moment and dir moment that player wants to focus
+      \brief create change_focus command and its effect with change_focus parameter
+      \param moment change_focus dist moment and dir moment that player wants to focus
 
       command argument moment is normalized by server parameter.
     */
-    void setFocus( const double & dist_moment, const AngleDeg & dir_moment );
+    void changeFocus( const double & dist_moment, const AngleDeg & dir_moment );
 
     /*!
       \brief create change_view command
@@ -420,12 +420,12 @@ public:
       }
 
     /*!
-      \brief check if set_focus is performed to update SelfObject
-      \return true if set_focus is performed in previous cycle
+      \brief check if change_focus is performed to update SelfObject
+      \return true if change_focus is performed in previous cycle
     */
-    bool doneSetFocus() const
+    bool doneChangeFocus() const
       {
-          return M_done_set_focus;
+          return M_done_change_focus;
       }
     //////////////////////////////////////////////////////////////
 
